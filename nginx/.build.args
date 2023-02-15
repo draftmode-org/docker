@@ -1,1 +1,2 @@
 IMAGE_TAG=1.23.3-alpine
+BUILD_TAG_PREFIX=webfux/nginx
