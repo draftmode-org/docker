@@ -1,0 +1,2 @@
+IMAGE_NAME=mariadb
+IMAGE_TAG=10.9.5-jammy
