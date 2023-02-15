@@ -1,4 +1,4 @@
-# contrib
+# docker
 
 ## nginx
 #### build stages
