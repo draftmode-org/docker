@@ -4,4 +4,5 @@ ARG IMAGE_TAG
 
 FROM ${IMAGE_NAME}:${IMAGE_TAG}
 
-RUN apt-get update
+RUN apt-get update \
+  && apt-get upgrade --assume-yes

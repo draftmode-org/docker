@@ -22,6 +22,7 @@ ENV BUILD_DEPS \
     yaml-dev
 
 ENV APK_ADD \
+    acl \
     icu-libs \
     freetype \
     libpng libjpeg-turbo \

@@ -12,6 +12,7 @@
 - XDEBUG_VERSION=3.1.6
 
 #### included extensions
+- acl (required for setfacl)
 - freetype
 - libpng, libjpeg-turbo
 - libzip

@@ -1,3 +1,3 @@
 IMAGE_NAME=mariadb
-IMAGE_TAG=10.9.5-jammy
+IMAGE_TAG=10.11.2
 BUILD_TAG_PREFIX=webfux/mariadb
