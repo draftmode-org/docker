@@ -29,7 +29,8 @@ ENV APK_ADD \
     zlib libzip \
     yaml \
     bash \
-    nano
+    nano \
+    linux-headers
 
 ENV PECL_INSTALL \
     yaml-${YAML_VERSION}
