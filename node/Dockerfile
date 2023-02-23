@@ -1,6 +1,6 @@
-ARG NODE_IMAGE_TAG
+ARG IMAGE_TAG
 
-FROM node:${NODE_IMAGE_TAG}
+FROM node:${IMAGE_TAG}
 
 # for php:8.1.12-fpm-apline3.16
 # deticated updates to fix vulnerabilities

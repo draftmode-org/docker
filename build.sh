@@ -2,7 +2,6 @@
 set -e
 
 # shellcheck disable=SC2046
-BASE_FOLDER=$(realpath $(dirname "${0}"))
 BUILD_ARG_FILE=".build.args"
 DOCKER_FILE="Dockerfile"
 
@@ -35,7 +34,7 @@ function exit_help() {
 if [[ -z ${1} ]]; then
   exit_help "argument [DOCKER_FOLDER] missing"
 fi
-DOCKER_FOLDER=${BASE_FOLDER}/${1}
+DOCKER_FOLDER="${PWD}/${1}"
 
 if [ ! -f "${DOCKER_FOLDER}/${DOCKER_FILE}" ]; then
   exit_help "${DOCKER_FOLDER}/${DOCKER_FILE} file does not exists"
