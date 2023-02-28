@@ -4,7 +4,8 @@ FROM nginx:${IMAGE_TAG}
 
 ENV APK_ADD \
     bash \
-    nano
+    nano \
+    openssl
 
 RUN apk add --update --no-cache ${APK_ADD} \
     && apk upgrade --available
