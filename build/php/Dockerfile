@@ -101,12 +101,11 @@ ENV PHP_FPM_USER="www-data"
 ENV PHP_FPM_GROUP="www-data"
 COPY php-fpm.d/zzz_200_www.conf $PHP_FPM_DIR/zzz_200_www.conf
 
-ENV PHP_FPM_LISTEN_DIR="/var/run/php"
-ENV PHP_FPM_LISTEN_FILE="php-fpm.sock"
-ENV PHP_FPM_LISTEN="$PHP_FPM_LISTEN_DIR/$PHP_FPM_LISTEN_FILE"
+# fpm-conf/[www] socket section
+ENV PHP_FPM_LISTEN="/sockets/php.socket"
 COPY php-fpm.d/zzz_200_www_listen.conf $PHP_FPM_DIR/zzz_200_www_listen.conf
-# create SOCKET directory
-RUN mkdir -p $PHP_FPM_LISTEN_DIR
+RUN addgroup --gid 3000 --system socket \
+    && adduser --uid 3000 --system disable-login --disable-password --gird 3000 socket
 
 ENV PHP_FPM_LOG="%R - %t \"%m %r%Q%q\" %s len=%l %f dur=%{mili}dms mem=%{kilo}Mk cpu=%C%%"
 COPY php-fpm.d/zzz_200_www_log.conf $PHP_FPM_DIR/zzz_200_www_log.conf

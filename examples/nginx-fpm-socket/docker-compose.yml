@@ -1,0 +1,61 @@
+version: "3.4"
+services:
+  php:
+    container_name: php
+    build:
+      context: ./service/php
+      dockerfile: .deploy/Dockerfile
+      args:
+        IMAGE_NAME: webfux/php82-fpm
+        IMAGE_TAG: 2.0.1
+        APP_ENV: dev
+        WORK_DIR: /var/app
+    environment:
+      PHP_FPM_LISTEN: /sockets/fpm
+    volumes:
+      # mount socket
+      - sockets:/sockets
+      # mount PHP application (only local, production COPY)
+      - ./service/php:/var/app
+      # prevent mounting folders outside docker (ONLY LOCAL)
+      - /var/app/vendor
+      # fpm-socket configuration
+      - ./service/php/.deploy/php-fpm.d/zzz_200_www_listen.conf:/usr/local/etc/php-fpm.d/zzz_200_www_listen.conf:ro
+    expose:
+      - 9000
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  webserver:
+    container_name: webserver
+    build:
+      context: ./service/webserver
+      dockerfile: .deploy/Dockerfile
+      args:
+        IMAGE_NAME: webfux/nginx
+        IMAGE_TAG: 1.0.1
+    depends_on:
+      - php
+    ports:
+      - target: 80
+        published: 80
+    environment:
+      - APP_DOMAIN=webfux.io
+      - SUB_DOMAIN_FRONTEND=www.dev
+      - SUB_DOMAIN_BACKEND=api.dev
+    volumes:
+      # mount socket PHP <=> nginx (!path+file configured in php-base-image!)
+      - sockets:/sockets:rw
+      # mount public php content (folder public)
+      # only for local dev, production: COPY inside Dockerfile
+      - ./service/php/public:/var/html/api:ro
+      # mount public webserver content (folder public)
+      # only for local dev, production: COPY inside Dockerfile
+      - ./service/webserver/public:/var/html/www
+      # nginx config
+      - ./webserver/.deploy/nginx/templates:/etc/nginx/templates/:ro
+      # data (login page)
+      - ./webserver/public:/var/html/webserver
+
+volumes:
+  sockets:

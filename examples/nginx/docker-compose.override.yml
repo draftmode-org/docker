@@ -1,0 +1,12 @@
+version: "3.4"
+services:
+  webserver:
+    build:
+      context: ./webserver
+      dockerfile: .deploy/Dockerfile
+      args:
+        APP_ENV: dev
+      target: dev
+    volumes:
+      - ./webserver/public:/var/html/www
+      - ./webserver/.deploy/templates:/etc/nginx/templates/:ro

@@ -2,9 +2,7 @@
 * php is configured within FPM using SOCKET
 * every image start PHP-FPM as root
 ```
-ENV PHP_FPM_LISTEN_DIR="/var/run/php"
-ENV PHP_FPM_LISTEN_FILE="php-fpm.sock"
-ENV PHP_FPM_LISTEN="${PHP_FPM_LISTEN_DIR}/{$PHP_FPM_LISTEN_FILE}"
+ENV PHP_FPM_LISTEN="/sockets/php.socket"
 ```
 
 ### build stages

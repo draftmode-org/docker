@@ -6,11 +6,14 @@ ENV APK_ADD \
     bash \
     nano \
     openssl
-
+#
+# update, install and upgrade
+#
 RUN apk add --update --no-cache ${APK_ADD} \
     && apk upgrade --available
 
-ENV ENV_CONFIG_ROOT_FOLDER=/etc/nginx
-
-RUN mkdir -p ${ENV_CONFIG_ROOT_FOLDER}/conf.d
-COPY conf/location/*.conf ${ENV_CONFIG_ROOT_FOLDER}/location/
+#
+# copy shared location examples
+#
+RUN mkdir -p /etc/nginx/shared
+COPY shared/*.conf /etc/nginx/shared

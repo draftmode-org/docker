@@ -1,0 +1,13 @@
+    server {
+        listen 80;
+
+        server_name ${WWW_SUB_DOMAIN}.${BASE_DOMAIN};
+
+        error_log  /var/log/nginx/${WWW_SUB_DOMAIN}.${BASE_DOMAIN}.error.log;
+        access_log /var/log/nginx/${WWW_SUB_DOMAIN}.${BASE_DOMAIN}.access.log;
+
+        root /var/html/www;
+
+        include /etc/nginx/shared/assets-html.conf;
+        include /etc/nginx/shared/assets-media.conf;
+    }
