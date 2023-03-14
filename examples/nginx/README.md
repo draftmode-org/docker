@@ -3,7 +3,7 @@ As simple as possible.
 
 - one service (based on webfux/nginx base image)
 - static files
-- listen for port 80 and given domain<br>
+- listen on port 80 and given domain<br>
 ```
     environment:
       - BASE_DOMAIN=webfux.io
