@@ -75,10 +75,29 @@ On startup, the nginx entrypoint script scans this directory for files with *.te
 result
 ```
 # /etc/nginx/templates/default.conf
-server {
-  listen       80;
-  server_name  www.example.io;
-}
+  server {
+    listen       80;
+    server_name  www.example.io;
+  }
+```
+#### Protect undefined server_names
+Based on our example above we´ve created a server_name directive only for "www.example.io". But, if any other DNS resolves to the same NGINX you will protect unknown/-defined server_name(s). To do this, just add the next lines on top.
+```
+  server {
+    listen 80 default_server;
+    return 403;
+  }
+```
+for 80, 443
+```
+  server {
+    listen 80 default_server;
+    listen 443 default_server;
+    
+    # ssl keys for default server
+        
+    return 403;
+  }
 ```
 #### Cross Origin issue
 example:

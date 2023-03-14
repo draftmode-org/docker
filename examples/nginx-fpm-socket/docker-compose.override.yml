@@ -1,5 +1,22 @@
 version: "3.4"
 services:
+  php:
+    container_name: php
+    build:
+      context: ./php
+      dockerfile: .deploy/Dockerfile
+      args:
+        IMAGE_NAME: webfux/php82-fpm
+        # for Dockerfile stage: dev the image is extended with -xdebug
+        # IMAGE_TAG : 1.0.0 => 1.0.0-xdebug
+        IMAGE_TAG: 1.0.0
+        APP_ENV: dev
+      target: dev
+    volumes:
+      # mount PHP application (only local, production COPY)
+      - ./php:/var/app
+      # prevent mounting folders outside docker (ONLY LOCAL)
+      - /var/app/vendor
   webserver:
     build:
       context: ./webserver

@@ -69,9 +69,7 @@ The Dockerfile set a couple of arguments to configure PHP and FPM.
   - ENV PHP_FPM_USER="www-data"
   - PHP_FPM_GROUP="www-data"
 - php-fpm.d/zzz_200_www_listen.conf
-  - ENV PHP_FPM_LISTEN_DIR="/var/run/php"
-  - ENV PHP_FPM_LISTEN_FILE="php-fpm.sock"
-  - ENV PHP_FPM_LISTEN="${PHP_FPM_LISTEN_DIR}/{$PHP_FPM_LISTEN_FILE}"
+  - ENV PHP_FPM_LISTEN="/sockets/php.socket"
 - php-fpm.d/zzz_200_www_log.conf
   - ENV PHP_FPM_LOG="%R - %t \"%m %r%Q%q\" %s len=%l %f dur=%{mili}dms mem=%{kilo}Mk cpu=%C%%"
 - php-fpm.d/zzz_200_www_pm.conf

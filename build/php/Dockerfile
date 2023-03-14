@@ -104,8 +104,8 @@ COPY php-fpm.d/zzz_200_www.conf $PHP_FPM_DIR/zzz_200_www.conf
 # fpm-conf/[www] socket section
 ENV PHP_FPM_LISTEN="/sockets/php.socket"
 COPY php-fpm.d/zzz_200_www_listen.conf $PHP_FPM_DIR/zzz_200_www_listen.conf
-RUN addgroup --gid 3000 --system socket \
-    && adduser --uid 3000 --system disable-login --disable-password --gird 3000 socket
+# RUN addgroup --gid 3000 --system socket \
+#    && adduser --uid 3000 --system disable-login --disable-password --gird 3000 socket
 
 ENV PHP_FPM_LOG="%R - %t \"%m %r%Q%q\" %s len=%l %f dur=%{mili}dms mem=%{kilo}Mk cpu=%C%%"
 COPY php-fpm.d/zzz_200_www_log.conf $PHP_FPM_DIR/zzz_200_www_log.conf
@@ -119,13 +119,11 @@ ENV PHP_FPM_MAX_REQUESTS="1000"
 COPY php-fpm.d/zzz_200_www_pm.conf $PHP_FPM_DIR/zzz_200_www_pm.conf
 
 # health-check
-COPY script/docker-healthcheck.sh $BIN_DIR/docker-healthcheck
-RUN chmod +x $BIN_DIR/docker-healthcheck
-
-# TODO: has to be verified
+# COPY script/docker-healthcheck.sh $BIN_DIR/docker-healthcheck
+# RUN chmod +x $BIN_DIR/docker-healthcheck
 # HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
 
-CMD [ "php-fpm", "--allow-to-run-as-root" ]
+# CMD [ "php-fpm", "--allow-to-run-as-root" ]
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

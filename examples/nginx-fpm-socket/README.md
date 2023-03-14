@@ -3,6 +3,7 @@ As simple as possible.
 
 - two service
   - php: (based on webfux/php base image)
+    - using composer
   - nginx: (based on webfux/nginx base image)
 - ...
   - ...

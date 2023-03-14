@@ -3,59 +3,47 @@ services:
   php:
     container_name: php
     build:
-      context: ./service/php
+      context: ./php
       dockerfile: .deploy/Dockerfile
       args:
         IMAGE_NAME: webfux/php82-fpm
-        IMAGE_TAG: 2.0.1
-        APP_ENV: dev
-        WORK_DIR: /var/app
+        IMAGE_TAG: 1.0.0
+        APP_ENV: prod
+      target: production
+    working_dir: /var/app/public
     environment:
-      PHP_FPM_LISTEN: /sockets/fpm
+      PHP_FPM_LISTEN: /socket/fpm.sock
     volumes:
-      # mount socket
-      - sockets:/sockets
-      # mount PHP application (only local, production COPY)
-      - ./service/php:/var/app
-      # prevent mounting folders outside docker (ONLY LOCAL)
-      - /var/app/vendor
-      # fpm-socket configuration
-      - ./service/php/.deploy/php-fpm.d/zzz_200_www_listen.conf:/usr/local/etc/php-fpm.d/zzz_200_www_listen.conf:ro
-    expose:
-      - 9000
-    extra_hosts:
-      - host.docker.internal:host-gateway
+      - sockets:/socket
+      # just temporarily: has to be moved into nginx base image
+      - ./php/.deploy/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint:ro
+      - ./php/.deploy/php-fpm.d/zzz_200_www_listen.conf:/usr/local/etc/php-fpm.d/zzz_200_www_listen.conf:ro
+      - ./php/.deploy/docker-entrypoint.d/99-unix-socket-user.sh:/docker-entrypoint.d/99-unix-socket-user.sh:ro
 
   webserver:
     container_name: webserver
     build:
-      context: ./service/webserver
+      context: ./webserver
       dockerfile: .deploy/Dockerfile
       args:
         IMAGE_NAME: webfux/nginx
-        IMAGE_TAG: 1.0.1
-    depends_on:
-      - php
+        IMAGE_TAG: 1.0.0
+        APP_ENV: prod
+      target: production
+    working_dir: /var/html/www
     ports:
       - target: 80
         published: 80
     environment:
-      - APP_DOMAIN=webfux.io
-      - SUB_DOMAIN_FRONTEND=www.dev
-      - SUB_DOMAIN_BACKEND=api.dev
+      - BASE_DOMAIN=webfux.io
+      - WWW_SUB_DOMAIN=www.dev
+      - API_SUB_DOMAIN=api.dev
+      - API_SOCKET=/socket/fpm.sock
     volumes:
-      # mount socket PHP <=> nginx (!path+file configured in php-base-image!)
-      - sockets:/sockets:rw
-      # mount public php content (folder public)
-      # only for local dev, production: COPY inside Dockerfile
-      - ./service/php/public:/var/html/api:ro
-      # mount public webserver content (folder public)
-      # only for local dev, production: COPY inside Dockerfile
-      - ./service/webserver/public:/var/html/www
-      # nginx config
-      - ./webserver/.deploy/nginx/templates:/etc/nginx/templates/:ro
-      # data (login page)
-      - ./webserver/public:/var/html/webserver
-
+      - sockets:/socket
+      # just temporarily: has to be moved into nginx base image
+      # missing function => get username from nginx.conf
+      - ./webserver/.deploy/docker-entrypoint.d/99-unix-socket-user.sh:/docker-entrypoint.d/99-unix-socket-user.sh:ro
+        
 volumes:
   sockets:
