@@ -7,18 +7,13 @@ services:
       dockerfile: .deploy/Dockerfile
       args:
         IMAGE_NAME: webfux/php82-fpm
-        IMAGE_TAG: 1.0.0
-        APP_ENV: prod
+        IMAGE_TAG: 1.1.0
       target: production
-    working_dir: /var/app/public
+    working_dir: /var/app
     environment:
       PHP_FPM_LISTEN: /socket/fpm.sock
     volumes:
       - sockets:/socket
-      # just temporarily: has to be moved into nginx base image
-      - ./php/.deploy/docker-entrypoint.sh:/usr/local/bin/docker-entrypoint:ro
-      - ./php/.deploy/php-fpm.d/zzz_200_www_listen.conf:/usr/local/etc/php-fpm.d/zzz_200_www_listen.conf:ro
-      - ./php/.deploy/docker-entrypoint.d/99-unix-socket-user.sh:/docker-entrypoint.d/99-unix-socket-user.sh:ro
 
   webserver:
     container_name: webserver
@@ -27,10 +22,8 @@ services:
       dockerfile: .deploy/Dockerfile
       args:
         IMAGE_NAME: webfux/nginx
-        IMAGE_TAG: 1.0.0
-        APP_ENV: prod
+        IMAGE_TAG: 1.1.0
       target: production
-    working_dir: /var/html/www
     ports:
       - target: 80
         published: 80
@@ -41,9 +34,6 @@ services:
       - API_SOCKET=/socket/fpm.sock
     volumes:
       - sockets:/socket
-      # just temporarily: has to be moved into nginx base image
-      # missing function => get username from nginx.conf
-      - ./webserver/.deploy/docker-entrypoint.d/99-unix-socket-user.sh:/docker-entrypoint.d/99-unix-socket-user.sh:ro
-        
+
 volumes:
   sockets:

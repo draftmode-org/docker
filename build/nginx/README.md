@@ -14,8 +14,30 @@ Changelog:
 - bash
 - nano
 - openssl
+- tzdata
 
-#### shared (location directives)
+## docker-entrypoint.t
+A couple of common entry-point/initialize scripts are provided to solve regular issues.<br>
+Cause these image has to be used as "base" images, none of the provided scripts are executed.<br><br>
+```
+#
+# to use them in our "real" Dockerfile
+#
+
+# move it to docker-entrypoint.d folder
+#
+RUN mv /docker-entrypoint.t/99-unix-socket-user.sh /docker-entrypoint.d/99-unix-socket-user.sh
+
+# or, just run the bash script
+#
+RUN /docker-entrypoint.t/99-unix-socket-user.sh
+```
+### 99-unix-socket-user
+File: /docker-entrypoint.d/templates/99-unix-socket-user.sh<br>
+Add a new usergroup "socket" and attach nginx.conf based user to this group.<br>
+It´s mandatory to share access between PHP-FPM and NGINX by sockets.
+
+## shared (location directives)
 Most of the location directives are common. folder /shared provides a couple of this common location patterns.
 
 e.g. /etc/nginx/shared/assets-doc.conf
@@ -121,3 +143,17 @@ how to solve:
       add_header 'Access-Control-Allow-Credentials' 'true';
     }
 ```
+#### set timezone
+1. get Region + Citiy
+```
+# get all avalibale regions
+ls /usr/share/zoneinfo -la
+
+# list avalible cities inside a region
+ls /usr/share/zoneinfo/Europe -la
+```
+2. set ENV in Dockerfile
+```
+ENV TZ=Europe/Vienna
+```
+   

@@ -10,6 +10,7 @@ _How to build base images: [README.md](../build/README.md)_
 
 **Examples**
 1. [NGINX with static files](nginx/README.md)
+2. [NGINX with FPM and socket](nginx-fpm-socket/README.md)
 
 # Guideline
 ## Docker and Docker compose

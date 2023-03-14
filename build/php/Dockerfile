@@ -30,7 +30,8 @@ ENV APK_ADD_NO_CACHE \
     yaml \
     bash \
     nano \
-    linux-headers
+    linux-headers \
+    tzdata
 
 ENV PECL_INSTALL \
     yaml-${YAML_VERSION}
@@ -104,8 +105,6 @@ COPY php-fpm.d/zzz_200_www.conf $PHP_FPM_DIR/zzz_200_www.conf
 # fpm-conf/[www] socket section
 ENV PHP_FPM_LISTEN="/sockets/php.socket"
 COPY php-fpm.d/zzz_200_www_listen.conf $PHP_FPM_DIR/zzz_200_www_listen.conf
-# RUN addgroup --gid 3000 --system socket \
-#    && adduser --uid 3000 --system disable-login --disable-password --gird 3000 socket
 
 ENV PHP_FPM_LOG="%R - %t \"%m %r%Q%q\" %s len=%l %f dur=%{mili}dms mem=%{kilo}Mk cpu=%C%%"
 COPY php-fpm.d/zzz_200_www_log.conf $PHP_FPM_DIR/zzz_200_www_log.conf
@@ -118,12 +117,24 @@ ENV PHP_FPM_MAX_SPARE_SERVERS="2"
 ENV PHP_FPM_MAX_REQUESTS="1000"
 COPY php-fpm.d/zzz_200_www_pm.conf $PHP_FPM_DIR/zzz_200_www_pm.conf
 
+#
+# COPY bin
+#
+COPY bin/docker-entrypoint.sh $BIN_DIR/docker-entrypoint
+COPY bin/docker-healthcheck.sh $BIN_DIR/docker-healthcheck
+RUN chmod +x $BIN_DIR/docker-entrypoint \
+    && chmod +x $BIN_DIR/docker-healthcheck
+
+#
+# COPY docker-entrypoint.templates
+#
+COPY docker-entrypoint.t $BIN_DIR/docker-entrypoint.t
+RUN chmod +x -R $BIN_DIR/docker-entrypoint.t \
+ && mkdir /usr/local/bin/docker-entrypoint.d
+
 # health-check
-# COPY script/docker-healthcheck.sh $BIN_DIR/docker-healthcheck
-# RUN chmod +x $BIN_DIR/docker-healthcheck
 # HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
 
-# CMD [ "php-fpm", "--allow-to-run-as-root" ]
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------
@@ -134,8 +145,6 @@ ENV APK_ADD \
     git
 
 FROM production as xdebug
-
-ENV APP_ENV=dev XDEBUG_MODE=off
 ARG XDEBUG_VERSION
 
 #

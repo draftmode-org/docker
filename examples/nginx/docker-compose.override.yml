@@ -4,8 +4,6 @@ services:
     build:
       context: ./webserver
       dockerfile: .deploy/Dockerfile
-      args:
-        APP_ENV: dev
       target: dev
     volumes:
       - ./webserver/public:/var/html/www

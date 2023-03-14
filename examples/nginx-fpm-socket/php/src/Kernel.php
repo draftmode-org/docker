@@ -6,7 +6,13 @@ class Kernel {
     /**
      * @return string
      */
-    public function HelloWorld() : string {
+    public function verifyClass() : string {
+        return __METHOD__;
+    }
+
+    public function verifyDB() : string {
+        return __METHOD__;
+/*
         $dbHost     = getenv("MYSQL_HOST");
         $dbName     = getenv("MYSQL_DATABASE");
         $dbUser     = getenv("MYSQL_USER");
@@ -22,5 +28,6 @@ class Kernel {
             echo $exception->getMessage();
         }
         return self::MESSAGE;
+*/
     }
 }

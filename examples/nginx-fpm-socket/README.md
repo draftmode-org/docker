@@ -5,8 +5,12 @@ As simple as possible.
   - php: (based on webfux/php base image)
     - using composer
   - nginx: (based on webfux/nginx base image)
-- ...
-  - ...
+
+- for nginx
+  - 99-unix-socket-user (to attach nginx user to usergroup "socket")
+- for php
+  - 99-unix-socket-user (to attach ```$(whoami)``` user to usergroup "socket")
+  - 99-php-composer-install (run run composer install)
 
 ### How to deploy
 [Usage of docker compose command](../README.md#usage-of-docker-compose-command)

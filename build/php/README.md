@@ -1,20 +1,17 @@
 # PHP Base images
 * php is configured within FPM using SOCKET
 * every image start PHP-FPM as root
-```
-ENV PHP_FPM_LISTEN="/sockets/php.socket"
-```
 
-### build stages
+## build stages
 - production
 - xdebug
 
-### build args
+## build args
 - IMAGE_TAG=8.1.12-fpm-alpine3.16
 - YAML_VERSION=2.2.2
 - XDEBUG_VERSION=3.1.6
 
-### included extensions
+## included extensions
 - acl (required for setfacl)
 - icu-libs
 - freetype
@@ -28,8 +25,9 @@ ENV PHP_FPM_LISTEN="/sockets/php.socket"
 - bash
 - nano
 - linux-headers
+- tzdata
 
-### included php extensions
+## included php extensions
 - opcache
 - pdo pdo_mysql
 - intl
@@ -38,12 +36,12 @@ ENV PHP_FPM_LISTEN="/sockets/php.socket"
 - curl
 - xml
 
-### xdebug stage additional includes
+## xdebug stage additional includes
 - git
 - xdebug
 - composer
 
-### configuration arguments (php / fpm) ####
+## configuration arguments (php / fpm) ####
 The Dockerfile set a couple of arguments to configure PHP and FPM.
 
 - conf.d/zzz_200_opcache.ini 
@@ -79,3 +77,76 @@ The Dockerfile set a couple of arguments to configure PHP and FPM.
   - ENV PHP_FPM_MIN_SPARE_SERVERS="1"
   - ENV PHP_FPM_MAX_SPARE_SERVERS="2"
   - ENV PHP_FPM_MAX_REQUESTS="1000"
+
+## docker-entrypoint
+Our PHP base image provide his own docker-entrypoint. It
+1. find all files in /user/local/bin/docker-entrypoint.d/ and
+   1. source all *.envsh files
+   2. execute all *.sh files
+2. ``exec docker-php-entrypoint "$@"``
+ 
+The technic is close to the default way NGINX works with /docker-entrypoint.d/ folder.<br><br>
+```
+#
+# to use them in our "real" Dockerfile
+#
+
+ENTRYPOINT ["docker-entrypoint"]
+CMD ["php-fpm"]
+```
+
+## docker-entrypoint.t
+A couple of common entry-point/initialize scripts are provided to solve regular issues.<br>
+Cause these image has to be used as "base" images, none of the provided scripts are executed.<br><br>
+```
+#
+# to use them in our "real" Dockerfile
+#
+
+# move it to docker-entrypoint.d folder
+RUN mv /usr/local/bin/docker-entrypoint.t/99-php-composer-install.sh /usr/local/bin/docker-entrypoint.d/99-php-composer-install.sh
+
+# or, just run the bash script
+#
+RUN /usr/local/bin/docker-entrypoint.t/99-php-composer-install.sh
+```
+
+### 99-unix-socket-user
+File: /docker-entrypoint.d/templates/99-unix-socket-user.sh<br>
+Add a new usergroup "socket" and attach ```$(whoami)``` user to this group.<br>
+It´s mandatory to share access between PHP-FPM and NGINX by sockets. 
+
+### 99-php-composer-install
+File: /docker-entrypoint.d/templates/99-php-composer-install.sh
+Base on the given ENV COMPOSER_INSTALL_ARGUMENTS composer install will be executed.<br>
+example:
+```
+COMPOSER_INSTALL_ARGUMENTS=--prefer-dist --no-dev
+
+# 99-php-composer-install.sh will execute
+composer install --prefer-dist --no-dev
+```
+_notice: to run composer install in Dockerfile_
+```
+#
+# allow composer to run as root user
+#
+COMPOSER_ALLOW_SUPERUSER=1
+RUN /usr/local/bin/docker-entrypoint.t/99-php-composer-install.sh
+```
+
+### How to (FAQ)
+#### set timezone
+1. get Region + Citiy
+```
+# get all avalibale regions
+ls /usr/share/zoneinfo -la
+
+# list avalible cities inside a region
+ls /usr/share/zoneinfo/Europe -la
+```
+2. set ENV in Dockerfile
+```
+ENV TZ=Europe/Vienna
+```
+   

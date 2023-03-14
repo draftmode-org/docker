@@ -8,11 +8,15 @@ entrypoint_log() {
 }
 
 if [ "$1" = "php-fpm" ]; then
-    if /usr/bin/find "/docker-entrypoint.d/" -mindepth 1 -maxdepth 1 -type f -print -quit 2>/dev/null | read v; then
-        entrypoint_log "$0: /docker-entrypoint.d/ is not empty, will attempt to perform configuration"
-
-        entrypoint_log "$0: Looking for shell scripts in /docker-entrypoint.d/"
-        find "/docker-entrypoint.d/" -follow -type f -print | sort -V | while read -r f; do
+    # set default for BIN folder
+    if [[ -z "${BIN_DIR}" ]]; then
+      BIN_DIR="/usr/local/bin"
+    fi;
+    FIND_FOLDER="${BIN_DIR}/docker-entrypoint.d"
+    if /usr/bin/find "${FIND_FOLDER}/" -mindepth 1 -maxdepth 1 -type f -print -quit 2>/dev/null | read v; then
+        entrypoint_log "$0: ${FIND_FOLDER} is not empty, will attempt to perform configuration"
+        entrypoint_log "$0: Looking for shell scripts in ${FIND_FOLDER}"
+        find "${FIND_FOLDER}/" -follow -type f -print | sort -V | while read -r f; do
             case "$f" in
                 *.envsh)
                     if [ -x "$f" ]; then
@@ -38,9 +42,9 @@ if [ "$1" = "php-fpm" ]; then
 
         entrypoint_log "$0: Configuration complete; ready for start up"
     else
-        entrypoint_log "$0: No files found in /docker-entrypoint.d/, skipping configuration"
+        entrypoint_log "$0: No files found in ${FIND_FOLDER}, skipping configuration"
     fi
 fi
 
-# exec docker-php-entrypoint "$@"
-exec "$@"
+exec docker-php-entrypoint "$@"
+# exec "$@"

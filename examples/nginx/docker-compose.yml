@@ -7,10 +7,8 @@ services:
       dockerfile: .deploy/Dockerfile
       args:
         IMAGE_NAME: webfux/nginx
-        IMAGE_TAG: 1.0.0
-        APP_ENV: prod
+        IMAGE_TAG: 1.1.0
       target: production
-    working_dir: /var/html/www
     ports:
       - target: 80
         published: 80
