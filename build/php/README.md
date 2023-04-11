@@ -113,8 +113,19 @@ RUN /usr/local/bin/docker-entrypoint.t/99-php-composer-install.sh
 
 ### 99-unix-socket-user
 File: /docker-entrypoint.d/templates/99-unix-socket-user.sh<br>
-Add a new usergroup "socket" and attach ```$(whoami)``` user to this group.<br>
-It´s mandatory to share access between PHP-FPM and NGINX by sockets. 
+Adds a new usergroup "socket" and attach ```$(whoami)``` user to this group.<br>
+It´s mandatory to share access between PHP-FPM and NGINX by sockets.
+```
+SOCKET_GROUP_NAME="socket"
+SOCKET_GROUP_ID=3000;
+```
+It´s also mandatory to config FPM [www] section like next snipped, as it is already provided in docker-entrypoint.t/999-unix-socket-user.sh.
+```
+[www]
+listen = ${PHP_FPM_LISTEN}
+listen.group = socket
+listen.mode = 0660
+```
 
 ### 99-php-composer-install
 File: /docker-entrypoint.d/templates/99-php-composer-install.sh

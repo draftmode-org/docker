@@ -24,7 +24,7 @@ Cause these image has to be used as "base" images, none of the provided scripts 
 # to use them in our "real" Dockerfile
 #
 
-# move it to docker-entrypoint.d folder
+# move it to docker-entrypoint.d folder to run the script automatically on start
 #
 RUN mv /docker-entrypoint.t/99-unix-socket-user.sh /docker-entrypoint.d/99-unix-socket-user.sh
 
@@ -33,9 +33,13 @@ RUN mv /docker-entrypoint.t/99-unix-socket-user.sh /docker-entrypoint.d/99-unix-
 RUN /docker-entrypoint.t/99-unix-socket-user.sh
 ```
 ### 99-unix-socket-user
-File: /docker-entrypoint.d/templates/99-unix-socket-user.sh<br>
-Add a new usergroup "socket" and attach nginx.conf based user to this group.<br>
-It´s mandatory to share access between PHP-FPM and NGINX by sockets.
+File: /docker-entrypoint.t/99-unix-socket-user.sh<br>
+Adds a new usergroup "socket" and attach nginx.conf based user to this group.<br>
+It´s mandatory to share access between PHP-FPM and NGINX by sockets.<br>
+```
+SOCKET_GROUP_NAME="socket"
+SOCKET_GROUP_ID=3000;
+```
 
 ## shared (location directives)
 Most of the location directives are common. folder /shared provides a couple of this common location patterns.
