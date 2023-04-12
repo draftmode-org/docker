@@ -104,6 +104,8 @@ COPY php-fpm.d/zzz_200_www.conf $PHP_FPM_DIR/zzz_200_www.conf
 
 # fpm-conf/[www] socket section
 ENV PHP_FPM_LISTEN="/sockets/php.socket"
+ENV PHP_FPM_LISTEN_GROUP="socket"
+ENV PHP_FPM_LISTEN_GROUP_ID=3000
 COPY php-fpm.d/zzz_200_www_listen.conf $PHP_FPM_DIR/zzz_200_www_listen.conf
 
 ENV PHP_FPM_LOG="%R - %t \"%m %r%Q%q\" %s len=%l %f dur=%{mili}dms mem=%{kilo}Mk cpu=%C%%"
@@ -128,9 +130,10 @@ RUN chmod +x $BIN_DIR/docker-entrypoint \
 #
 # COPY docker-entrypoint.templates
 #
-COPY docker-entrypoint.t $BIN_DIR/docker-entrypoint.t
-RUN chmod +x -R $BIN_DIR/docker-entrypoint.t \
- && mkdir /usr/local/bin/docker-entrypoint.d
+# COPY docker-entrypoint.t $BIN_DIR/docker-entrypoint.t
+COPY docker-entrypoint.d $BIN_DIR/docker-entrypoint.d
+# RUN chmod +x -R $BIN_DIR/docker-entrypoint.t \
+RUN chmod +x -R $BIN_DIR/docker-entrypoint.d
 
 # health-check
 # HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["docker-healthcheck"]

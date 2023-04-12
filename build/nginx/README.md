@@ -16,29 +16,15 @@ Changelog:
 - openssl
 - tzdata
 
-## docker-entrypoint.t
-A couple of common entry-point/initialize scripts are provided to solve regular issues.<br>
-Cause these image has to be used as "base" images, none of the provided scripts are executed.<br><br>
-```
-#
-# to use them in our "real" Dockerfile
-#
-
-# move it to docker-entrypoint.d folder to run the script automatically on start
-#
-RUN mv /docker-entrypoint.t/99-unix-socket-user.sh /docker-entrypoint.d/99-unix-socket-user.sh
-
-# or, just run the bash script
-#
-RUN /docker-entrypoint.t/99-unix-socket-user.sh
-```
-### 99-unix-socket-user
-File: /docker-entrypoint.t/99-unix-socket-user.sh<br>
-Adds a new usergroup "socket" and attach nginx.conf based user to this group.<br>
+## docker-entrypoint.d
+### 90-unix-socket-user
+File: /docker-entrypoint.d/90-unix-socket-user.sh<br>
+Adds a new usergroup "socket" and attaches the nginx.conf based user to this group.<br>
 It´s mandatory to share access between PHP-FPM and NGINX by sockets.<br>
 ```
-SOCKET_GROUP_NAME="socket"
-SOCKET_GROUP_ID=3000;
+ENV NGINX_CONF_FILE="/etc/nginx/nginx.conf"
+ENV NGINX_SOCKET_GROUP="socket"
+ENV NGINX_SOCKET_GROUP_ID=3000
 ```
 
 ## shared (location directives)
@@ -57,8 +43,8 @@ e.g. /etc/nginx/shared/assets-doc.conf
 example for an included /conf.d/*.conf
 ```
     server {
+        listen [::]:80;
         listen 80;
-        listen 443;
 
         server_name www.dev.webfux.io;
 
@@ -76,6 +62,7 @@ Get for most common questions answers
 ```
     server {
       listen 80 default_server;
+      listen [::]:80 default_server;
       return 301 https://$host$request_uri;
     }
 ```
@@ -85,7 +72,8 @@ example
 ```
 # /etc/nginx/templates/default.conf.template
 server {
-    listen       80;
+    listen 80;
+    listen [::]:80;
     server_name  ${NGINX_SERVER};
 }
 ```
@@ -102,7 +90,8 @@ result
 ```
 # /etc/nginx/templates/default.conf
   server {
-    listen       80;
+    listen 80;
+    listen [::]:80;
     server_name  www.example.io;
   }
 ```
@@ -110,6 +99,7 @@ result
 Based on our example above we´ve created a server_name directive only for "www.example.io". But, if any other DNS resolves to the same NGINX you will protect unknown/-defined server_name(s). To do this, just add the next lines on top.
 ```
   server {
+    listen [::]:80 default_server;
     listen 80 default_server;
     return 403;
   }
@@ -118,9 +108,13 @@ for 80, 443
 ```
   server {
     listen 80 default_server;
+    listen [::]:80 default_server;
     listen 443 default_server;
+    listen [::]:443 default_server;
     
     # ssl keys for default server
+    #
+    #
         
     return 403;
   }

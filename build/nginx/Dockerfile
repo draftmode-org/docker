@@ -20,7 +20,11 @@ RUN mkdir -p /etc/nginx/shared
 COPY shared/*.conf /etc/nginx/shared
 
 #
-# COPY docker-entrypoint.templates
+# COPY docker-entrypoint.d
 #
-COPY docker-entrypoint.t /docker-entrypoint.t
-RUN chmod +x -R /docker-entrypoint.t
+COPY docker-entrypoint.d /docker-entrypoint.d
+RUN chmod +x -R /docker-entrypoint.d
+
+ENV NGINX_CONF_FILE="/etc/nginx/nginx.conf"
+ENV NGINX_SOCKET_GROUP="socket"
+ENV NGINX_SOCKET_GROUP_ID=3000

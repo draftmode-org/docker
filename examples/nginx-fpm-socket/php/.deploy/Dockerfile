@@ -10,9 +10,9 @@ ENV APP_ENV=${APP_ENV}
 ENV TZ=Europe/Vienna
 
 ENV COMPOSER_CACHE_DIR=/var/app/.cache/composer
-ENV COMPOSER_INSTALL_ARGUMENTS=" --no-interaction --prefer-dist"
-RUN mv /usr/local/bin/docker-entrypoint.t/99-unix-socket-user.sh /usr/local/bin/docker-entrypoint.d/99-unix-socket-user.sh \
- && mv /usr/local/bin/docker-entrypoint.t/99-php-composer-install.sh /usr/local/bin/docker-entrypoint.d/99-php-composer-install.sh
+# ENV COMPOSER_INSTALL_ARGUMENTS=" --no-interaction --prefer-dist"
+# RUN mv /usr/local/bin/docker-entrypoint.t/99-unix-socket-user.sh /usr/local/bin/docker-entrypoint.d/99-unix-socket-user.sh \
+# && mv /usr/local/bin/docker-entrypoint.t/99-php-composer-install.sh /usr/local/bin/docker-entrypoint.d/99-php-composer-install.sh
 
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
@@ -53,9 +53,6 @@ WORKDIR $WORK_DIR
 COPY --from=build-stage $WORK_DIR/vendor/ ./vendor
 COPY ./public ./public
 COPY ./src ./src
-
-# run 99-unix-socket-user
-RUN /usr/local/bin/docker-entrypoint.t/99-unix-socket-user.sh
 
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]

@@ -12,7 +12,7 @@
 - XDEBUG_VERSION=3.1.6
 
 ## included extensions
-- acl (required for setfacl)
+- acl (_required for **setfacl**_)
 - icu-libs
 - freetype
 - libpng, libjpeg-turbo
@@ -68,6 +68,10 @@ The Dockerfile set a couple of arguments to configure PHP and FPM.
   - PHP_FPM_GROUP="www-data"
 - php-fpm.d/zzz_200_www_listen.conf
   - ENV PHP_FPM_LISTEN="/sockets/php.socket"
+  - ENV PHP_FPM_LISTEN_GROUP="socket"<br>
+    _**has to be identically to the NGINX_SOCKET_GROUP**_
+  - ENV PHP_FPM_LISTEN_GROUP_ID=3000<br>
+    _**has to be identically to the NGINX_SOCKET_GROUP_ID**_
 - php-fpm.d/zzz_200_www_log.conf
   - ENV PHP_FPM_LOG="%R - %t \"%m %r%Q%q\" %s len=%l %f dur=%{mili}dms mem=%{kilo}Mk cpu=%C%%"
 - php-fpm.d/zzz_200_www_pm.conf
@@ -94,56 +98,21 @@ The technic is close to the default way NGINX works with /docker-entrypoint.d/ f
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
 ```
-
-## docker-entrypoint.t
-A couple of common entry-point/initialize scripts are provided to solve regular issues.<br>
-Cause these image has to be used as "base" images, none of the provided scripts are executed.<br><br>
-```
-#
-# to use them in our "real" Dockerfile
-#
-
-# move it to docker-entrypoint.d folder
-RUN mv /usr/local/bin/docker-entrypoint.t/99-php-composer-install.sh /usr/local/bin/docker-entrypoint.d/99-php-composer-install.sh
-
-# or, just run the bash script
-#
-RUN /usr/local/bin/docker-entrypoint.t/99-php-composer-install.sh
-```
-
-### 99-unix-socket-user
-File: /docker-entrypoint.d/templates/99-unix-socket-user.sh<br>
-Adds a new usergroup "socket" and attach ```$(whoami)``` user to this group.<br>
+## docker-entrypoint.d
+### 90-unix-socket-user
+File: /docker-entrypoint.d/90-unix-socket-user.sh<br>
+Adds a new usergroup "socket" and attaches ```$(whoami)``` user to this group.<br>
 It´s mandatory to share access between PHP-FPM and NGINX by sockets.
 ```
-SOCKET_GROUP_NAME="socket"
-SOCKET_GROUP_ID=3000;
+ENV PHP_FPM_LISTEN_GROUP="socket"
+ENV PHP_FPM_LISTEN_GROUP_ID=3000
 ```
 It´s also mandatory to config FPM [www] section like next snipped, as it is already provided in docker-entrypoint.t/999-unix-socket-user.sh.
 ```
 [www]
 listen = ${PHP_FPM_LISTEN}
-listen.group = socket
+listen.group = ${PHP_FPM_LISTEN_GROUP}
 listen.mode = 0660
-```
-
-### 99-php-composer-install
-File: /docker-entrypoint.d/templates/99-php-composer-install.sh
-Base on the given ENV COMPOSER_INSTALL_ARGUMENTS composer install will be executed.<br>
-example:
-```
-COMPOSER_INSTALL_ARGUMENTS=--prefer-dist --no-dev
-
-# 99-php-composer-install.sh will execute
-composer install --prefer-dist --no-dev
-```
-_notice: to run composer install in Dockerfile_
-```
-#
-# allow composer to run as root user
-#
-COMPOSER_ALLOW_SUPERUSER=1
-RUN /usr/local/bin/docker-entrypoint.t/99-php-composer-install.sh
 ```
 
 ### How to (FAQ)
