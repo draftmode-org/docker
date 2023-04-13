@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.9"
 services:
   webserver:
     container_name: webserver
@@ -7,11 +7,11 @@ services:
       dockerfile: .deploy/Dockerfile
       args:
         IMAGE_NAME: webfux/nginx
-        IMAGE_TAG: 1.1.0
+        IMAGE_TAG: 1.0.1
       target: production
     ports:
       - target: 80
         published: 80
     environment:
-      - BASE_DOMAIN=webfux.io
-      - WWW_SUB_DOMAIN=www.dev
+      - DOMAIN=webfux.io
+      - WEBSERVER_SUB_DOMAIN=www.dev

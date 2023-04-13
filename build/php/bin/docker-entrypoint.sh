@@ -2,7 +2,7 @@
 set -e
 
 entrypoint_log() {
-    if [ -z "${FPM_ENTRYPOINT_QUIET_LOGS:-}" ]; then
+    if [ -z "${PHP_ENTRYPOINT_QUIET_LOGS:-}" ]; then
         echo "$@"
     fi
 }

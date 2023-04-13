@@ -14,10 +14,10 @@
         listen [::]:80;
         listen 80;
 
-        server_name ${WWW_SUB_DOMAIN}.${BASE_DOMAIN};
+        server_name ${WEBSERVER_SUB_DOMAIN}.${DOMAIN};
 
-        error_log  /var/log/nginx/${WWW_SUB_DOMAIN}.${BASE_DOMAIN}.error.log;
-        access_log /var/log/nginx/${WWW_SUB_DOMAIN}.${BASE_DOMAIN}.access.log;
+        error_log  /var/log/nginx/${WEBSERVER_SUB_DOMAIN}.${DOMAIN}.error.log;
+        access_log /var/log/nginx/${WEBSERVER_SUB_DOMAIN}.${DOMAIN}.access.log;
 
         root /var/html/www;
 
@@ -29,11 +29,11 @@
     # php
     #
     upstream _php {
-        server unix:${API_SOCKET};
+        server unix:${APP_SOCKET};
     }
     server {
         listen 80;
-        server_name ${API_SUB_DOMAIN}.${BASE_DOMAIN};
+        server_name ${APP_SUB_DOMAIN}.${DOMAIN};
 
         location / {
             root /var/html/api;
@@ -45,7 +45,7 @@
             # cross origin section
             # allow cross origin for all http_origins from same DOMAIN
             set $cors "";
-            if ($http_origin ~* (.*\.${BASE_DOMAIN})) {
+            if ($http_origin ~* (.*\.${DOMAIN})) {
                 set $cors "true";
             }
             if ($cors = "true") {

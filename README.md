@@ -1,4 +1,10 @@
-## FAQ
+## FAQ (Docker Desktop + WSL2)
+### restart WSL
+1. Open Command Prompt [Win + R]
+2. ```wsl --shutdown```<br>
+
+will automatically shut down + restart WSL
+
 ### docker endpoint for "default" not found
 
 **How to reproduce**

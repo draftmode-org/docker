@@ -6,7 +6,8 @@ _How to build base images: [README.md](../build/README.md)_
 **Guideline**
 1. [Docker and Docker compose](#docker-and-docker-compose)
    1. [Understanding multiple Compose files](#understanding-multiple-compose-files)
-   2. [BuildContext for Dockerfiles](#buildcontext-for-dockerfiles)
+   2. [Usage of docker compose command](#usage-of-docker-compose-command)
+   3. [BuildContext for Dockerfiles](#buildcontext-for-dockerfiles)
 
 **Examples**
 1. [NGINX with static files](nginx/README.md)
@@ -23,7 +24,7 @@ By default, Compose reads two files:
 Contains your base configuration.
 #### docker-compose.override.yml
 The override file, as its name implies, can contain configuration overrides for existing services or entirely new services.
-#### Usage of docker compose command
+### Usage of docker compose command
 ```
 # local deployment (with docker-compose.override.yml)
 docker compose up -d

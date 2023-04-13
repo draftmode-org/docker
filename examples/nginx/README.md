@@ -6,8 +6,12 @@ As simple as possible.
 - listen on port 80 and given domain<br>
 ```
     environment:
-      - BASE_DOMAIN=webfux.io
-      - WWW_SUB_DOMAIN=www.dev
+      - DOMAIN=webfux.io
+      - WEBSERVER_SUB_DOMAIN=www.dev
+```
+- /.deploy/templates/default.conf.template
+```
+    server_name ${WEBSERVER_SUB_DOMAIN}.${DOMAIN};
 ```
 ### How to deploy
 [Usage of docker compose command](../README.md#usage-of-docker-compose-command)

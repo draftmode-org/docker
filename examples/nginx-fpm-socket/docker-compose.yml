@@ -1,17 +1,20 @@
-version: "3.4"
+version: "3.9"
 services:
-  php:
-    container_name: php
+  app:
+    container_name: app
     build:
       context: ./php
       dockerfile: .deploy/Dockerfile
       args:
         IMAGE_NAME: webfux/php82-fpm
-        IMAGE_TAG: 1.1.0
+        IMAGE_TAG: 1.0.1
       target: production
     working_dir: /var/app
     environment:
-      PHP_FPM_LISTEN: /socket/fpm.sock
+      PHP_FPM_LISTEN: /socket/app.sock
+#    depends_on:
+#      webserver:
+#        condition: service_healthy
     volumes:
       - sockets:/socket
 
@@ -22,16 +25,18 @@ services:
       dockerfile: .deploy/Dockerfile
       args:
         IMAGE_NAME: webfux/nginx
-        IMAGE_TAG: 1.1.0
+        IMAGE_TAG: 1.0.1
       target: production
     ports:
       - target: 80
         published: 80
     environment:
-      - BASE_DOMAIN=webfux.io
-      - WWW_SUB_DOMAIN=www.dev
-      - API_SUB_DOMAIN=api.dev
-      - API_SOCKET=/socket/fpm.sock
+      - DOMAIN=webfux.io
+      - WEBSERVER_SUB_DOMAIN=www.dev
+      - APP_SUB_DOMAIN=api.dev
+      - APP_SOCKET=/socket/app.sock
+    healthcheck:
+      test: /docker-healthcheck.sh
     volumes:
       - sockets:/socket
 

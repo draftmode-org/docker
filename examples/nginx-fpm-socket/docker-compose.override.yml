@@ -1,7 +1,7 @@
-version: "3.4"
+version: "3.9"
 services:
-  php:
-    container_name: php
+  app:
+    container_name: app
     build:
       context: ./php
       dockerfile: .deploy/Dockerfile
@@ -15,5 +15,6 @@ services:
       dockerfile: .deploy/Dockerfile
       target: dev
     volumes:
+      - ./webserver/.deploy/docker-healthcheck.d:/docker-healthcheck.d
       - ./webserver/public:/var/html/www
       - ./webserver/.deploy/templates:/etc/nginx/templates/:ro

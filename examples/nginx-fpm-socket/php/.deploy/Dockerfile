@@ -5,14 +5,13 @@ ARG IMAGE_TAG
 # dev
 #
 FROM ${IMAGE_NAME}:${IMAGE_TAG}-xdebug as dev
-ARG APP_ENV=dev
-ENV APP_ENV=${APP_ENV}
+ENV WORK_DIR=/var/app
 ENV TZ=Europe/Vienna
+WORKDIR $WORK_DIR
 
-ENV COMPOSER_CACHE_DIR=/var/app/.cache/composer
-# ENV COMPOSER_INSTALL_ARGUMENTS=" --no-interaction --prefer-dist"
-# RUN mv /usr/local/bin/docker-entrypoint.t/99-unix-socket-user.sh /usr/local/bin/docker-entrypoint.d/99-unix-socket-user.sh \
-# && mv /usr/local/bin/docker-entrypoint.t/99-php-composer-install.sh /usr/local/bin/docker-entrypoint.d/99-php-composer-install.sh
+# ENV PHP_COMPOSER_CACHE_DIR=$WORK_DIR/.cache/composer
+ENV PHP_COMPOSER_INSTALL_ARGUMENTS="--no-interaction --prefer-dist"
+COPY .deploy/docker-entrypoint.d/100-php-composer-install.sh /etc/docker-entrypoint-d/
 
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
@@ -21,19 +20,23 @@ CMD ["php-fpm"]
 # build-stage
 #
 FROM ${IMAGE_NAME}:${IMAGE_TAG}-xdebug as build-stage
-WORKDIR /var/app
+ENV WORK_DIR=/var/app
+ENV TZ=Europe/Vienna
+WORKDIR $WORK_DIR
+
 COPY composer.* symfony.* ./
 
-ENV COMPOSER_CACHE_DIR=/var/app/.cache/composer
-ENV COMPOSER_INSTALL_ARGUMENTS="--no-interaction --prefer-dist --no-dev --no-scripts --no-progress"
-ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN composer install $COMPOSER_INSTALL_ARGUMENTS
+# ENV PHP_COMPOSER_CACHE_DIR=$WORK_DIR/.cache/composer
+ENV PHP_COMPOSER_INSTALL_ARGUMENTS="--no-interaction --prefer-dist --no-dev --no-scripts --no-progress"
+COPY .deploy/docker-entrypoint.d/100-php-composer-install.sh /etc/docker-entrypoint-d/
+
 
 # ##############################################
 # test-stage
 #
 FROM ${IMAGE_NAME}:${IMAGE_TAG}-xdebug as test-stage
 ENV WORK_DIR=/var/app
+ENV TZ=Europe/Vienna
 WORKDIR $WORK_DIR
 
 COPY --from=build-stage $WORK_DIR/vendor/ ./vendor
