@@ -7,6 +7,7 @@ services:
       dockerfile: .deploy/Dockerfile
       target: dev
     volumes:
+      - ./php/.deploy/docker-entrypoint.d:/usr/local/bin/docker-entrypoint.d
       # mount PHP application (only local, production COPY)
       - ./php:/var/app
   webserver:
@@ -15,6 +16,5 @@ services:
       dockerfile: .deploy/Dockerfile
       target: dev
     volumes:
-      - ./webserver/.deploy/docker-healthcheck.d:/docker-healthcheck.d
       - ./webserver/public:/var/html/www
       - ./webserver/.deploy/templates:/etc/nginx/templates/:ro

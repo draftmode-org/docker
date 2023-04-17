@@ -10,8 +10,11 @@ ENV TZ=Europe/Vienna
 WORKDIR $WORK_DIR
 
 # ENV PHP_COMPOSER_CACHE_DIR=$WORK_DIR/.cache/composer
-ENV PHP_COMPOSER_INSTALL_ARGUMENTS="--no-interaction --prefer-dist"
-COPY .deploy/docker-entrypoint.d/100-php-composer-install.sh /etc/docker-entrypoint-d/
+# ENV PHP_COMPOSER_INSTALL_ARGUMENTS="--no-interaction --prefer-dist"
+# COPY .deploy/docker-entrypoint.d/100-php-composer-install.sh $PHP_BIN_DIR/docker-entrypoint.d/
+
+# health-check
+HEALTHCHECK --interval=5s --timeout=1s CMD $BIN_DIR/docker-healthcheck || exit 1
 
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]

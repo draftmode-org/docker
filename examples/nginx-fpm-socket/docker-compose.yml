@@ -35,8 +35,9 @@ services:
       - WEBSERVER_SUB_DOMAIN=www.dev
       - APP_SUB_DOMAIN=api.dev
       - APP_SOCKET=/socket/app.sock
-    healthcheck:
-      test: /docker-healthcheck.sh
+    depends_on:
+      app:
+        condition: service_healthy
     volumes:
       - sockets:/socket
 

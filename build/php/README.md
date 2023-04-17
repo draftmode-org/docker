@@ -89,18 +89,16 @@ Our PHP base image provide his own docker-entrypoint. It
    2. execute all *.sh files
 2. ``exec docker-php-entrypoint "$@"``
  
-The technic is close to the default way NGINX works with /docker-entrypoint.d/ folder.<br><br>
+The technic is close to the default way NGINX works with /docker-entrypoint.d/ folder.
 ```
-#
-# to use them in our "real" Dockerfile
-#
+# Dockerfile
 
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
 ```
 ## docker-entrypoint.d
-### 90-unix-socket-user
-File: /docker-entrypoint.d/90-unix-socket-user.sh<br>
+### 00-unix-socket-user
+File: /docker-entrypoint.d/00-unix-socket-user.sh<br>
 Adds a new usergroup "socket" and attaches ```$(whoami)``` user to this group.<br>
 It´s mandatory to share access between PHP-FPM and NGINX by sockets.
 ```
@@ -113,6 +111,29 @@ It´s also mandatory to config FPM [www] section like next snipped, as it is alr
 listen = ${PHP_FPM_LISTEN}
 listen.group = ${PHP_FPM_LISTEN_GROUP}
 listen.mode = 0660
+```
+## docker-healthcheck
+Our PHP base image provide a docker-healthcheck. It
+1. find all files in /user/local/bin/docker-healthcheck.d/ and
+   2. source all *.envsh files
+   3. execute all *.sh files
+## docker-healthcheck.d
+### 00-fpm-socket
+File: /docker-healthcheck.d/00-fpm-socket.sh<br>
+Base on the EVN PHP_FPM_LISTEN a cgi-fcgi -bind -connect ${PHP_FPM_LISTEN} is tried.<br>
+```
+# Dockerfile
+
+HEALTHCHECK --interval=5s --timeout=1s CMD $BIN_DIR/docker-healthcheck || exit 1
+```
+To use the healthcheck in your docker-compose.yml it looks like:<br>
+**_notice: docker-compose.yml version: 3.9 required_**
+```
+# docker-compose.yml
+
+    depends_on:
+      app:
+        condition: service_healthy
 ```
 
 ### How to (FAQ)
@@ -129,4 +150,17 @@ ls /usr/share/zoneinfo/Europe -la
 ```
 ENV TZ=Europe/Vienna
 ```
-   
+#### Using Healthcheck
+```
+# Dockerfile
+
+HEALTHCHECK --interval=5s --timeout=1s CMD $BIN_DIR/docker-healthcheck || exit 1
+```
+**_docker-compose.yml version: 3.9 required_**
+```
+# docker-compose.yml
+
+    depends_on:
+      app:
+        condition: service_healthy
+```   

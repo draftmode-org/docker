@@ -69,7 +69,7 @@ RUN apk --no-cache --virtual .build-deps add ${BUILD_DEPS} \
 # folder configs
 #
 ENV PHP_FPM_DIR="/usr/local/etc/php-fpm.d"
-ENV BIN_DIR="/usr/local/bin"
+ENV PHP_BIN_DIR="/usr/local/bin"
 #
 # configure PHP
 #
@@ -120,24 +120,23 @@ ENV PHP_FPM_MAX_REQUESTS="1000"
 COPY php-fpm.d/zzz_200_www_pm.conf $PHP_FPM_DIR/zzz_200_www_pm.conf
 
 #
-# COPY bin
+# COPY bin/docker-entrypoint
+#   && bin/docker-healthcheck
 #
-COPY bin/docker-entrypoint.sh $BIN_DIR/docker-entrypoint
-COPY bin/docker-healthcheck.sh $BIN_DIR/docker-healthcheck
-RUN chmod +x $BIN_DIR/docker-entrypoint \
-    && chmod +x $BIN_DIR/docker-healthcheck
+COPY bin/docker-entrypoint.sh $PHP_BIN_DIR/docker-entrypoint
+COPY bin/docker-healthcheck.sh $PHP_BIN_DIR/docker-healthcheck
+RUN chmod +x $PHP_BIN_DIR/docker-entrypoint \
+    && chmod +x $PHP_BIN_DIR/docker-healthcheck
 
 #
-# COPY docker-entrypoint.templates
+# COPY docker-entrypoint.d
+#  and docker-healthcheck.d
+# defaults
 #
-# COPY docker-entrypoint.t $BIN_DIR/docker-entrypoint.t
-COPY docker-entrypoint.d $BIN_DIR/docker-entrypoint.d
-# RUN chmod +x -R $BIN_DIR/docker-entrypoint.t \
-RUN chmod +x -R $BIN_DIR/docker-entrypoint.d
-
-# health-check
-# HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["docker-healthcheck"]
-
+COPY docker-entrypoint.d $PHP_BIN_DIR/docker-entrypoint.d
+COPY docker-healthcheck.d $PHP_BIN_DIR/docker-healthcheck.d
+RUN chmod +x -R $PHP_BIN_DIR/docker-entrypoint.d \
+ && chmod +x -R $PHP_BIN_DIR/docker-healthcheck.d
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

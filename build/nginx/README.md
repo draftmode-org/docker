@@ -17,8 +17,8 @@ Changelog:
 - tzdata
 
 ## docker-entrypoint.d
-### 90-unix-socket-user
-File: /docker-entrypoint.d/90-unix-socket-user.sh<br>
+### 00-unix-socket-user
+File: /docker-entrypoint.d/00-unix-socket-user.sh<br>
 Adds a new usergroup "socket" and attaches the nginx.conf based user to this group.<br>
 It´s mandatory to share access between PHP-FPM and NGINX by sockets.<br>
 ```
