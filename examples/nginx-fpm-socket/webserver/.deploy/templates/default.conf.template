@@ -21,8 +21,8 @@
 
         root /var/html/www;
 
-        include /etc/nginx/shared/assets-html.conf;
-        include /etc/nginx/shared/assets-media.conf;
+        include /etc/nginx/location.t/assets-html.conf;
+        include /etc/nginx/location.t/assets-media.conf;
     }
 
     #

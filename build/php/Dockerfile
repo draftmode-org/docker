@@ -120,23 +120,25 @@ ENV PHP_FPM_MAX_REQUESTS="1000"
 COPY php-fpm.d/zzz_200_www_pm.conf $PHP_FPM_DIR/zzz_200_www_pm.conf
 
 #
-# COPY bin/docker-entrypoint
-#   && bin/docker-healthcheck
+# docker-entrypoint
+# docker-healthcheck
+# .bashrc
 #
 COPY bin/docker-entrypoint.sh $PHP_BIN_DIR/docker-entrypoint
 COPY bin/docker-healthcheck.sh $PHP_BIN_DIR/docker-healthcheck
-RUN chmod +x $PHP_BIN_DIR/docker-entrypoint \
-    && chmod +x $PHP_BIN_DIR/docker-healthcheck
+COPY docker-entrypoint.t $PHP_BIN_DIR/docker-entrypoint.t
+COPY docker-healthcheck.t $PHP_BIN_DIR/docker-healthcheck.t
+COPY bin/.bashrc $PHP_BIN_DIR/.bashrc
 
-#
-# COPY docker-entrypoint.d
-#  and docker-healthcheck.d
-# defaults
-#
-COPY docker-entrypoint.d $PHP_BIN_DIR/docker-entrypoint.d
-COPY docker-healthcheck.d $PHP_BIN_DIR/docker-healthcheck.d
-RUN chmod +x -R $PHP_BIN_DIR/docker-entrypoint.d \
- && chmod +x -R $PHP_BIN_DIR/docker-healthcheck.d
+RUN mkdir -p $PHP_BIN_DIR/docker-healthcheck.d \
+ && mkdir -p $PHP_BIN_DIR/docker-entrypoint.d \
+ && chmod +x $PHP_BIN_DIR/.bashrc \
+ && chmod +x $PHP_BIN_DIR/docker-entrypoint \
+ && chmod +x $PHP_BIN_DIR/docker-healthcheck \
+ && chmod +x -R $PHP_BIN_DIR/docker-entrypoint.t \
+ && chmod +x -R $PHP_BIN_DIR/docker-healthcheck.t
+
+ENV BASH_ENV=$PHP_BIN_DIR/.bashrc
 
 # ----------------------------------------------------------------------------
 # ----------------------------------------------------------------------------

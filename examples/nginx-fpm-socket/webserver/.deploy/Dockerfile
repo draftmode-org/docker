@@ -9,8 +9,8 @@ ENV WORK_DIR=/var/html/www
 ENV TZ=Europe/Vienna
 WORKDIR $WORK_DIR
 
-COPY .deploy/docker-healthcheck.sh /
-RUN chmod +x -R /docker-healthcheck.sh
+# docker-entrypoint
+RUN cp /docker-entrypoint.t/00-unix-socket-user.sh /docker-entrypoint.d
 
 # ##############################################
 # production

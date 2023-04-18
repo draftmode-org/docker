@@ -14,16 +14,26 @@ RUN apk add --update --no-cache ${APK_ADD} \
     && apk upgrade --available
 
 #
-# copy shared location examples
+# docker-entrypoint
+# docker-healthcheck
+# .bashrc
 #
-RUN mkdir -p /etc/nginx/shared
-COPY shared/*.conf /etc/nginx/shared
+COPY bin/docker-entrypoint.sh $PHP_BIN_DIR/docker-entrypoint.sh
+COPY bin/docker-healthcheck.sh /docker-healthcheck
+COPY docker-entrypoint.t /docker-entrypoint.t
+COPY docker-healthcheck.t /docker-healthcheck.t
+COPY bin/.bashrc /.bashrc
+COPY location.t /etc/nginx/location.t
 
-#
-# COPY docker-entrypoint.d
-#
-COPY docker-entrypoint.d /docker-entrypoint.d
-RUN chmod +x -R /docker-entrypoint.d
+RUN mkdir -p /docker-healthcheck.d \
+ && mkdir -p /docker-entrypoint.d \
+ && chmod +x /.bashrc \
+ && chmod +x /docker-entrypoint.sh \
+ && chmod +x /docker-healthcheck \
+ && chmod +x -R /docker-entrypoint.t \
+ && chmod +x -R /docker-healthcheck.t
+
+ENV BASH_ENV=/.bashrc
 
 ENV NGINX_CONF_FILE="/etc/nginx/nginx.conf"
 ENV NGINX_SOCKET_GROUP="socket"

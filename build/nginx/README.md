@@ -5,20 +5,21 @@
 - BUILD_TAG_PREFIX<br>
 Is used to TAG the built image, actually set: _webfux/nginx_
 
-Changelog:
-- 12.03.2023
-  - Tag: 1.0.0
-  - Size: 48 MB
-
 ## included extensions
 - bash
 - nano
 - openssl
 - tzdata
 
-## docker-entrypoint.d
-### 00-unix-socket-user
-File: /docker-entrypoint.d/00-unix-socket-user.sh<br>
+## docker-entrypoint.t
+This folder provides a collection of usefully scripts.<br>
+To use our examples, move/copy the files to /docker-entrypoint.d folder.
+```
+# Dockerfile
+
+RUN cp /docker-entrypoint.t/00-unix-socket-user.sh /docker-entrypoint.d 
+```
+### 00-unix-socket-user.sh
 Adds a new usergroup "socket" and attaches the nginx.conf based user to this group.<br>
 It´s mandatory to share access between PHP-FPM and NGINX by sockets.<br>
 ```
@@ -26,11 +27,36 @@ ENV NGINX_CONF_FILE="/etc/nginx/nginx.conf"
 ENV NGINX_SOCKET_GROUP="socket"
 ENV NGINX_SOCKET_GROUP_ID=3000
 ```
+## docker-healthcheck
+The docker-healthcheck script is identically to /docker-entrypoint.sh logic.<br>
+It does:
+1. find all files in /user/local/bin/docker-healthcheck.d/
+  2. execute all *.sh files<br>
 
-## shared (location directives)
-Most of the location directives are common. folder /shared provides a couple of this common location patterns.
+Usage:
+```
+# Dockerfile
+HEALTHCHECK --interval=5s --timeout=1s CMD /docker-healthcheck || exit 1
+```
+```
+# docker-compose.yml
+# !! docker-compose.yml verion 3.9 required !!
+    depends_on:
+      app:
+        condition: service_healthy
+```
+## docker-healthcheck.t
+This folder provides a collection of usefully scripts.<br>
+To use our examples, move/copy the files to /docker-healthcheck.d folder.
+```
+# Dockerfile
 
-e.g. /etc/nginx/shared/assets-doc.conf
+RUN cp /docker-healthcheck.t/00-ping.sh /docker-healthcheck.d 
+```
+## location.t
+Most of the location directives are common. folder /location.t provides a couple of this common location patterns.
+
+e.g. /etc/nginx/location.t/assets-doc.conf
 ```
     ###############################################################
     # serve static files (images,js) directly
@@ -53,7 +79,7 @@ example for an included /conf.d/*.conf
 
         root /var/www/html;
 
-        include /etc/nginx/shared/assets-doc.conf;
+        include /etc/nginx/location.t/assets-doc.conf;
     }
 ```
 ### How to (FAQ)
@@ -154,4 +180,21 @@ ls /usr/share/zoneinfo/Europe -la
 ```
 ENV TZ=Europe/Vienna
 ```
+#### Using Healthcheck
+In general, we recommend adding you healthcheck CALL inside the Dockerfile.<br>
+The healthcheck has to verify if you running container supports everything for you application.
+```
+# Dockerfile
+
+HEALTHCHECK --interval=5s --timeout=1s CMD /docker-healthcheck || exit 1
+```
+```
+# docker-compose.yml
+# !! docker-compose.yml verion 3.9 required !!
+
+    depends_on:
+      app:
+        condition: service_healthy
+```
+
    

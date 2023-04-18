@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
 
-if [ "$1" = "php-fpm" ]; then
-  BIN_DIR=${PHP_BIN_DIR:="/usr/local/bin"}
-  FIND_FOLDER="${BIN_DIR}/docker-entrypoint.d"
+# shellcheck disable=SC2166
+if [ "$1" = "nginx" -o "$1" = "nginx-debug" ]; then
+  FIND_FOLDER="/docker-entrypoint.d"
   # shellcheck disable=SC2162
   # shellcheck disable=SC2034
-  if /usr/bin/find "${FIND_FOLDER}/" -mindepth 1 -maxdepth 1 -type f -print -quit 2>/dev/null | read v; then
+  if /usr/bin/find "$FIND_FOLDER/" -mindepth 1 -maxdepth 1 -type f -print -quit 2>/dev/null | read v; then
     log_notice "${FIND_FOLDER} is not empty, will attempt to perform configuration"
     log_notice "Looking for shell scripts in ${FIND_FOLDER}"
     find "${FIND_FOLDER}/" -follow -type f -print | sort -V | while read -r f; do
@@ -33,10 +33,10 @@ if [ "$1" = "php-fpm" ]; then
         ;;
       esac
     done
-    log_notice "Configuration complete; ready for start up"
+    entrypoint_log "$0: Configuration complete; ready for start up"
   else
-    log_notice "No files found in ${FIND_FOLDER}, configuration complete"
+    entrypoint_log "$0: No files found in /docker-entrypoint.d/, skipping configuration"
   fi
 fi
 
-exec docker-php-entrypoint "$@"
+exec "$@"

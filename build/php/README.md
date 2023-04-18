@@ -83,22 +83,26 @@ The Dockerfile set a couple of arguments to configure PHP and FPM.
   - ENV PHP_FPM_MAX_REQUESTS="1000"
 
 ## docker-entrypoint
-Our PHP base image provide his own docker-entrypoint. It
-1. find all files in /user/local/bin/docker-entrypoint.d/ and
-   1. source all *.envsh files
-   2. execute all *.sh files
-2. ``exec docker-php-entrypoint "$@"``
- 
-The technic is close to the default way NGINX works with /docker-entrypoint.d/ folder.
+Our PHP base image provide his own docker-entrypoint. The used technic is close to the way NGINX works with /docker-entrypoint.d/ folder.<br>
+The scripts located in $PHP_BIN_DIR/docker-entrypoint.d are only executed when
 ```
-# Dockerfile
-
 ENTRYPOINT ["docker-entrypoint"]
 CMD ["php-fpm"]
 ```
-## docker-entrypoint.d
-### 00-unix-socket-user
-File: /docker-entrypoint.d/00-unix-socket-user.sh<br>
+The docker-entrypoint does:
+1. find all files in $PHP_BIN_DIR/docker-entrypoint.d/
+   1. source all *.envsh files
+   2. execute all *.sh files
+2. run ``exec docker-php-entrypoint "$@"``
+## docker-entrypoint.t
+This folder provides a collection of usefully scripts.<br>
+To use our examples, move/copy the files to /docker-entrypoint.d folder.
+```
+# Dockerfile
+
+RUN cp $PHP_BIN_DIR/docker-entrypoint.t/00-unix-socket-user.sh $PHP_BIN_DIR/docker-entrypoint.d 
+```
+### 00-unix-socket-user.sh
 Adds a new usergroup "socket" and attaches ```$(whoami)``` user to this group.<br>
 It´s mandatory to share access between PHP-FPM and NGINX by sockets.
 ```
@@ -113,28 +117,33 @@ listen.group = ${PHP_FPM_LISTEN_GROUP}
 listen.mode = 0660
 ```
 ## docker-healthcheck
-Our PHP base image provide a docker-healthcheck. It
-1. find all files in /user/local/bin/docker-healthcheck.d/ and
-   2. source all *.envsh files
-   3. execute all *.sh files
-## docker-healthcheck.d
-### 00-fpm-socket
-File: /docker-healthcheck.d/00-fpm-socket.sh<br>
-Base on the EVN PHP_FPM_LISTEN a cgi-fcgi -bind -connect ${PHP_FPM_LISTEN} is tried.<br>
+Our PHP base image provide a docker-healthcheck script. The used technic is close to the way NGINX works with /docker-healthcheck.d/ folder.<br>
+The docker-healthcheck does:
+1. find all files in /user/local/bin/docker-healthcheck.d/
+    2. execute all *.sh files<br>
+ 
+Usage:
 ```
 # Dockerfile
-
-HEALTHCHECK --interval=5s --timeout=1s CMD $BIN_DIR/docker-healthcheck || exit 1
+HEALTHCHECK --interval=5s --timeout=1s CMD $PHP_BIN_DIR/docker-healthcheck || exit 1
 ```
-To use the healthcheck in your docker-compose.yml it looks like:<br>
-**_notice: docker-compose.yml version: 3.9 required_**
 ```
 # docker-compose.yml
-
+# !! docker-compose.yml verion 3.9 required !!
     depends_on:
       app:
         condition: service_healthy
 ```
+## docker-healthcheck.t
+This folder provides a collection of usefully scripts.<br>
+To use our examples, move/copy the files to /docker-healthcheck.d folder.
+```
+# Dockerfile
+
+RUN cp $PHP_BIN_DIR/docker-healthcheck.t/00-fpm-socket.sh $PHP_BIN_DIR/docker-healthcheck.d 
+```
+### 00-fpm-socket.sh
+Base on the EVN PHP_FPM_LISTEN a cgi-fcgi -bind -connect ${PHP_FPM_LISTEN} is tried.<br>
 
 ### How to (FAQ)
 #### set timezone
@@ -151,16 +160,18 @@ ls /usr/share/zoneinfo/Europe -la
 ENV TZ=Europe/Vienna
 ```
 #### Using Healthcheck
+In general, we recommend adding you healthcheck CALL inside the Dockerfile.<br>
+The healthcheck has to verify if you running container supports everything for you application. 
 ```
 # Dockerfile
 
 HEALTHCHECK --interval=5s --timeout=1s CMD $BIN_DIR/docker-healthcheck || exit 1
 ```
-**_docker-compose.yml version: 3.9 required_**
 ```
 # docker-compose.yml
+# !! docker-compose.yml verion 3.9 required !!
 
     depends_on:
       app:
         condition: service_healthy
-```   
+```
