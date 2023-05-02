@@ -1,0 +1,56 @@
+version: "3.9"
+services:
+  app:
+    container_name: app
+    build:
+      context: ./php
+      dockerfile: .deploy/Dockerfile
+      args:
+        IMAGE_NAME: webfux/php82-fpm
+        IMAGE_TAG: 1.0.1
+      target: production
+    working_dir: /var/app
+    environment:
+      PHP_FPM_LISTEN: /socket/app.sock
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - sockets:/socket
+
+  database:
+    container_name: database
+    build:
+      context: ./database
+      dockerfile: .deploy/Dockerfile
+      args:
+        IMAGE_NAME: webfux/mariadb
+        IMAGE_TAG: 1.0.1
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+
+  webserver:
+    container_name: webserver
+    build:
+      context: ./webserver
+      dockerfile: .deploy/Dockerfile
+      args:
+        IMAGE_NAME: webfux/nginx
+        IMAGE_TAG: 1.0.1
+      target: production
+    ports:
+      - target: 80
+        published: 80
+    environment:
+      - DOMAIN=webfux.io
+      - WEBSERVER_SUB_DOMAIN=www.dev
+      - APP_SUB_DOMAIN=api.dev
+      - APP_SOCKET=/socket/app.sock
+#    depends_on:
+#      app:
+#        condition: service_healthy
+    volumes:
+      - sockets:/socket
+
+volumes:
+  sockets:

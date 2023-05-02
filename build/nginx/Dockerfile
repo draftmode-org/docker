@@ -18,7 +18,7 @@ RUN apk add --update --no-cache ${APK_ADD} \
 # docker-healthcheck
 # .bashrc
 #
-COPY bin/docker-entrypoint.sh $PHP_BIN_DIR/docker-entrypoint.sh
+COPY bin/docker-entrypoint.sh /docker-entrypoint.sh
 COPY bin/docker-healthcheck.sh /docker-healthcheck
 COPY docker-entrypoint.t /docker-entrypoint.t
 COPY docker-healthcheck.t /docker-healthcheck.t

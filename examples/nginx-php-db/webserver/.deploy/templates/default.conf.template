@@ -1,0 +1,80 @@
+    #
+    # in default, if no better server_name matches found
+    #
+    server {
+        listen [::]:80 default_server;
+        listen 80 default_server;
+        return 403;
+    }
+
+    #
+    # www, static files
+    #
+    server {
+        listen [::]:80;
+        listen 80;
+
+        server_name ${WEBSERVER_SUB_DOMAIN}.${DOMAIN};
+
+        error_log  /var/log/nginx/${WEBSERVER_SUB_DOMAIN}.${DOMAIN}.error.log;
+        access_log /var/log/nginx/${WEBSERVER_SUB_DOMAIN}.${DOMAIN}.access.log;
+
+        root /var/html/www;
+
+        include /etc/nginx/location.t/assets-html.conf;
+        include /etc/nginx/location.t/assets-media.conf;
+    }
+
+    #
+    # php
+    #
+    upstream _php {
+        server unix:${APP_SOCKET};
+    }
+    server {
+        listen 80;
+        server_name ${APP_SUB_DOMAIN}.${DOMAIN};
+
+        location / {
+            root /var/html/api;
+            # try to serve file directly, fallback to index.php
+            try_files $uri /index.php$is_args$args;
+        }
+
+        location ~ ^/index\.php(/|$) {
+            # cross origin section
+            # allow cross origin for all http_origins from same DOMAIN
+            set $cors "";
+            if ($http_origin ~* (.*\.${DOMAIN})) {
+                set $cors "true";
+            }
+            if ($cors = "true") {
+              add_header 'Access-Control-Allow-Origin' "$http_origin";
+              add_header 'Access-Control-Allow-Credentials' 'true';
+            }
+
+            root /var/app/public;
+
+            fastcgi_split_path_info ^(.+\.php)(/.*)$;
+
+            # Mitigate https://httpoxy.org/ vulnerabilities
+            fastcgi_param HTTP_PROXY "";
+
+            # Bigger buffer size to handle cache invalidation headers expansion
+            fastcgi_buffer_size 32k;
+            fastcgi_buffers 8 16k;
+
+            fastcgi_index index.php;
+            fastcgi_pass _php;
+
+            include fastcgi_params;
+
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_param HTTP_X_REQUEST_ID $request_id;
+
+            # Prevents URIs that include the front controller. This will 404:
+            # http://domain.tld/index.php/some-path
+            # Remove the internal directive to allow URIs like this
+            internal;
+        }
+    }

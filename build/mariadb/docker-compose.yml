@@ -12,16 +12,8 @@ services:
     volumes:
     # persist data (inside docker)
       - datacontainer:/var/lib/mysql
-      - ./patch/health-check.sh:/usr/local/bin/health-check.sh
     ports:
       - "3306:3306"
-#    healthcheck:
-#      test: ["CMD", "/usr/local/bin/health-check.sh"]
-#      test: ["CMD", "/usr/local/bin/healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized"]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 3
-#      start_period: 30s
 volumes:
   # persist data (inside docker)
   datacontainer:
