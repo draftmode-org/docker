@@ -11,8 +11,10 @@ class Kernel {
     }
 
     public function verifyDB() : string {
-        return __METHOD__;
-/*
+        echo "<pre>";
+        var_dump(getenv());
+        echo "</pre>";
+        return self::MESSAGE;
         $dbHost     = getenv("MYSQL_HOST");
         $dbName     = getenv("MYSQL_DATABASE");
         $dbUser     = getenv("MYSQL_USER");
@@ -28,6 +30,5 @@ class Kernel {
             echo $exception->getMessage();
         }
         return self::MESSAGE;
-*/
     }
 }

@@ -10,8 +10,14 @@ services:
         IMAGE_TAG: 1.0.1
       target: production
     working_dir: /var/app
+    env_file:
+      - .env.local
     environment:
-      PHP_FPM_LISTEN: /socket/app.sock
+      - PHP_FPM_LISTEN=/socket/app.sock
+#      - MYSQL_HOST
+#      - MYSQL_DATABASE
+#      - MYSQL_USER
+#      - MYSQL_PASSWORD
     depends_on:
       database:
         condition: service_healthy

@@ -10,7 +10,9 @@ ENV TZ=Europe/Vienna
 WORKDIR $WORK_DIR
 
 # docker-entrypoint
-RUN cp $PHP_BIN_DIR/docker-entrypoint.t/00-unix-socket-user.sh $PHP_BIN_DIR/docker-entrypoint.d
+# RUN cp $PHP_BIN_DIR/docker-entrypoint.t/00-unix-socket-user.sh $PHP_BIN_DIR/docker-entrypoint.d \
+#  && cp $PHP_BIN_DIR/docker-entrypoint.t/01-php-composer-install-dev.sh $PHP_BIN_DIR/docker-entrypoint.d
+COPY .deploy/docker-entrypoint.sh $PHP_BIN_DIR/docker-entrypoint.sh
 
 # docker-healthcheck
 # RUN cp $PHP_BIN_DIR/docker-healthcheck.t/00-fpm-socket.sh $PHP_BIN_DIR/docker-healthcheck.d

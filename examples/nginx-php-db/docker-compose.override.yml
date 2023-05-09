@@ -6,7 +6,10 @@ services:
       context: ./php
       dockerfile: .deploy/Dockerfile
       target: dev
+#    user: 1000:1000
     volumes:
+      - ./php/docker-entrypoint.d:/usr/local/bin/docker-entrypoint.d
+      - ./php/php-fpm.d:/usr/local/etc/php-fpm.d
       # mount PHP application (only local, production COPY)
       - ./php:/var/app
   webserver:
