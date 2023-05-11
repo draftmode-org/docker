@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ea
 
 if [ "$1" = "php-fpm" ]; then
   BIN_DIR=${PHP_BIN_DIR:="/usr/local/bin"}
@@ -40,5 +40,12 @@ if [ "$1" = "php-fpm" ]; then
 fi
 
 export LUKAS=abc
-exec docker-php-entrypoint "$@"
+export MY_LUKAS=abc
+. $FIND_FOLDER/00-source-secrets.envsh
+# exec docker-php-entrypoint "$@"
+
+if [ "${1#-}" != "$1" ]; then
+  set -- php-fpm "$@"
+fi
+exec "$@"
 
