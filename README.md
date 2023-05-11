@@ -32,13 +32,13 @@ docker endpoint for "default" not found
 **How to solve**
 1. stop docker desktop and all containers
 2. go to path ~/.docker/contexts/meta
-```
-~/.docker/contexts/meta/(some sha256)/meta.json
-```
+    ```
+    ~/.docker/contexts/meta/(some sha256)/meta.json
+    ```
 3. delete file/folder
-```
-rm {fe9c6bd7a66301f49ca9b6a70b217107cd1284598bfc254700c989b916da791e} -R
-```
+    ```
+    rm {fe9c6bd7a66301f49ca9b6a70b217107cd1284598bfc254700c989b916da791e} -R
+    ```
 4. restart docker desktop
 
 ### exposing port TCP 0.0.0.0:80 -> 0.0.0.0:0: listen tcp 0.0.0.0:80: bind failure
@@ -51,25 +51,25 @@ there should be no other service than the service you currently start/want to st
 #### WINDOWS has already bound 0.0.0.0:80
 1. open ``Powershell`` as administrator
 2. get list of all listings to 0.0.0.0:80 
-```
-netstat -o -n -a -b | findstr 0.0.0.0:80
-```
-there should be no result, or
-```
-TCP    0.0.0.0:80             0.0.0.0:0              LISTENING         4
-```
+    ```
+    netstat -o -n -a -b | findstr 0.0.0.0:80
+    ```
+    there should be no result, or
+    ```
+    TCP    0.0.0.0:80             0.0.0.0:0              LISTENING         4
+    ```
 ##### verify: service W3SVC
 1. check if service is running/exists
-```
-Get-Service | Where {$_.Name -eq "W3SVC"}
-```
-empty result expected
-```
-Status   Name               DisplayName
-------   ----               -----------
-Running  W3SVC              WWW-Publishingdienst
-```
+    ```
+    Get-Service | Where {$_.Name -eq "W3SVC"}
+    ```
+    empty result expected
+    ```
+    Status   Name               DisplayName
+    ------   ----               -----------
+    Running  W3SVC              WWW-Publishingdienst
+    ```
 2. disable, if "Running"
-```
-Set-Service -Name "W3SVC" -StartupType disabled
-```
+    ```
+    Set-Service -Name "W3SVC" -StartupType disabled
+    ```
