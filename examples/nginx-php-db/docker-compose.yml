@@ -12,6 +12,9 @@ services:
     working_dir: /var/app
     env_file:
       - .env.local
+    secrets:
+      - source: MY_SECRET
+        target: DB_ROOT_PASSWORD
     environment:
       - PHP_FPM_LISTEN=/socket/app.sock
 #      - MYSQL_HOST
@@ -60,3 +63,7 @@ services:
 
 volumes:
   sockets:
+
+secrets:
+  MY_SECRET:
+    file: .secrets/MY_SECRET
