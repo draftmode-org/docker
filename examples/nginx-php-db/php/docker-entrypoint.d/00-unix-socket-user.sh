@@ -1,6 +1,4 @@
 #!/bin/bash
-set -e
-
 PHP_FPM_LISTEN_GROUP=${PHP_FPM_LISTEN_GROUP:="socket"}
 PHP_FPM_LISTEN_GROUP_ID=${PHP_FPM_LISTEN_GROUP_ID:=3000}
 log_notice "create GROUP (${PHP_FPM_LISTEN_GROUP} ${PHP_FPM_LISTEN_GROUP_ID}) for shared socket access"
