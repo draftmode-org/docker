@@ -8,15 +8,15 @@
 
 ```docker-compose down -v```
 
-### create new database
+### create database
 
-```docker-compose exec -it {servicename} patch-db.sh {database}```
+```docker-compose exec -it {servicename} create-db {database}```
 
-### create new user
+### create user and grant permissions
 
-```docker-compose exec -it {servicename} patch-user.sh {database} {user} {password} {grant-type}```
+```docker-compose exec -it {servicename} create-user --database={database} --user={user} --password={password} --grant={grant}```
 
-grant-type(s) are limited and covert by:
-- mig (=ALL)
-- app (=SELECT,UPDATE,INSERT,DELETE,EXECUTE)
-- ro (=SELECT)
+grant-types(s) are limited and covert by:
+- migration (=ALL)
+- application (=SELECT,UPDATE,INSERT,DELETE,EXECUTE)
+- readonly (=SELECT)

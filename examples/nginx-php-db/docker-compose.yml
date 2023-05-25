@@ -17,13 +17,14 @@ services:
         target: DB_ROOT_PASSWORD
     environment:
       - PHP_FPM_LISTEN=/socket/app.sock
+      - ENV_TEST=${MY_ENV_TEST}
 #      - MYSQL_HOST
 #      - MYSQL_DATABASE
 #      - MYSQL_USER
 #      - MYSQL_PASSWORD
-    depends_on:
-      database:
-        condition: service_healthy
+#    depends_on:
+#      database:
+#        condition: service_healthy
     volumes:
       - sockets:/socket
 
@@ -37,6 +38,9 @@ services:
         IMAGE_TAG: 1.0.1
     environment:
       - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - target: 3306
+        published: 3336
 
   webserver:
     container_name: webserver

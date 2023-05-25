@@ -2,8 +2,8 @@ log_notice() {
     log_log "notice" "$@"
 }
 log_error() {
-    log_log "error" "$@"
-    exit 1
+    log_log "errors" "$@"
+    kill -INT $$;
 }
 log_warning() {
     log_log "warning" "$@"

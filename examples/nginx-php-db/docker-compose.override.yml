@@ -12,6 +12,9 @@ services:
       - ./php/php-fpm.d:/usr/local/etc/php-fpm.d
       # mount PHP application (only local, production COPY)
       - ./php:/var/app
+  database:
+    volumes:
+      - ./database/bin:/usr/local/script
   webserver:
     build:
       context: ./webserver

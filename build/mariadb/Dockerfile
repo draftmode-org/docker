@@ -16,6 +16,7 @@ COPY docker-healthcheck.t $BIN_DIR/docker-healthcheck.t
 
 RUN mkdir -p $BIN_DIR/docker-healthcheck.d \
  && chmod +x $BIN_DIR/*.sh \
+ && mv $BIN_DIR/create-user.sh $BIN_DIR/create-user \
  && mv $BIN_DIR/.bashrc /.bashrc \
  && mv $BIN_DIR/docker-healthcheck.sh $BIN_DIR/docker-healthcheck \
  && chmod +x -R $BIN_DIR/docker-healthcheck.t

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # default configuration
 HOST=${MARIADB_ROOT_HOST:-%}
@@ -60,7 +61,7 @@ fi
 if [ -z "$GRANT" ]; then
   log_error "missing argument --grant (e.g. --grant=application)"
 fi
-
+exit 1
 INIT_DB_FOLDER="/docker-entrypoint-initdb.d"
 if [ -d "$INIT_DB_FOLDER" ]; then
   USER_ENV_FILE="/$INIT_DB_FOLDER/00-user-$USERNAME.env"
